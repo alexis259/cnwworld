@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavender & Velvet — World Roadmap 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --lv:        #7B5EA7;
+    --lv-light:  #B89FD8;
+    --lv-pale:   #EDE8F5;
+    --lv-deep:   #2E1F5E;
+    --lv-mid:    #5A3F8A;
+    --ink:       #14102A;
+    --muted:     #7A7490;
+    --border:    rgba(123,94,167,0.18);
+    --show:      #E8593C;
+    --world:     #2D9B6F;
+    --proof:     #C49A14;
+    --drop:      #3B8BD4;
+    --tour:      #C44B8A;
+    --bg:        #0E0B1F;
+    --card:      #181428;
+    --card2:     #1E1A30;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: #E8E4F0;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .everything { position: relative; z-index: 1; }
+
+  /* ── EDIT TOOLBAR ── */
+  #edit-bar {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #edit-toggle {
+    background: var(--lv);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 12px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(123,94,167,0.5);
+    transition: background 0.2s, transform 0.15s;
+  }
+  #edit-toggle:hover { background: var(--lv-mid); transform: translateY(-1px); }
+  #edit-toggle.active { background: #2D9B6F; box-shadow: 0 4px 24px rgba(45,155,111,0.4); }
+
+  #save-btn {
+    background: rgba(255,255,255,0.07);
+    color: rgba(232,228,240,0.6);
+    border: 0.5px solid var(--border);
+    border-radius: 100px;
+    padding: 12px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: none;
+  }
+  #save-btn.visible { display: block; }
+  #save-btn:hover { background: rgba(255,255,255,0.12); color: #E8E4F0; }
+
+  #saved-toast {
+    background: #2D9B6F;
+    color: #fff;
+    border-radius: 100px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  #saved-toast.show { opacity: 1; }
+
+  /* ── EDIT MODE STYLES ── */
+  body.edit-mode .event { cursor: default; }
+  body.edit-mode .event:hover { transform: none; }
+
+  [contenteditable="true"] {
+    outline: none;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    transition: background 0.15s;
+    cursor: text;
+  }
+  [contenteditable="true"]:hover {
+    background: rgba(123,94,167,0.15);
+  }
+  [contenteditable="true"]:focus {
+    background: rgba(123,94,167,0.22);
+    box-shadow: inset 0 0 0 1.5px rgba(184,159,216,0.4);
+  }
+
+  /* Edit mode indicator on editable fields */
+  body.edit-mode .event-title::after,
+  body.edit-mode .event-date::after,
+  body.edit-mode .event-desc::after {
+    content: ' ✎';
+    font-size: 10px;
+    opacity: 0.3;
+    font-style: normal;
+  }
+
+  /* ── DONE STATE ── */
+  .event.done { opacity: 0.45; }
+  .event.done .event-title { text-decoration: line-through; text-decoration-color: var(--lv-light); }
+
+  .done-btn {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(232,228,240,0.2);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: transparent;
+  }
+  .done-btn:hover { border-color: var(--world); color: var(--world); }
+  .event.done .done-btn {
+    background: var(--world);
+    border-color: var(--world);
+    color: #fff;
+  }
+
+  /* ── ADD EVENT BUTTON ── */
+  .add-event-btn {
+    display: none;
+    width: 100%;
+    background: rgba(123,94,167,0.06);
+    border: 1px dashed rgba(123,94,167,0.25);
+    border-radius: 10px;
+    padding: 12px;
+    color: rgba(184,159,216,0.5);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .add-event-btn:hover { background: rgba(123,94,167,0.1); color: var(--lv-light); border-color: var(--lv-light); }
+  body.edit-mode .add-event-btn { display: block; }
+
+  /* ── DELETE BUTTON (edit mode only) ── */
+  .delete-btn {
+    display: none;
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(232,89,60,0.15);
+    color: #E8593C;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s;
+    align-items: center; justify-content: center;
+  }
+  .delete-btn:hover { background: rgba(232,89,60,0.3); }
+  body.edit-mode .delete-btn { display: flex; }
+
+  /* ── CHIP EDITING ── */
+  .chip-add {
+    display: none;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px dashed rgba(123,94,167,0.35);
+    color: rgba(184,159,216,0.5);
+    cursor: pointer;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .chip-add:hover { color: var(--lv-light); border-color: var(--lv-light); }
+  body.edit-mode .chip-add { display: inline-block; }
+
+  .chip {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    color: rgba(232,228,240,0.45);
+    letter-spacing: 0.04em;
+    cursor: default;
+    transition: all 0.15s;
+    position: relative;
+  }
+  body.edit-mode .chip { cursor: pointer; padding-right: 22px; }
+  body.edit-mode .chip:hover { border-color: rgba(232,89,60,0.4); color: rgba(232,89,60,0.7); }
+  body.edit-mode .chip::after { content: '×'; position: absolute; right: 7px; top: 50%; transform: translateY(-50%); font-size: 12px; display: none; }
+  body.edit-mode .chip:hover::after { display: block; }
+
+  /* ── NOTES AREA ── */
+  .event-notes-wrap {
+    margin-top: 10px;
+    display: none;
+  }
+  .event.open .event-notes-wrap { display: block; }
+  .event-notes {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: rgba(232,228,240,0.4);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+    transition: border-color 0.15s;
+    display: none;
+  }
+  body.edit-mode .event-notes { display: block; }
+  .event-notes:focus { border-color: rgba(123,94,167,0.4); color: rgba(232,228,240,0.7); }
+  .notes-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(232,228,240,0.2); margin-bottom: 5px; display: none; }
+  body.edit-mode .notes-label { display: block; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 50%, rgba(123,94,167,0.35) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 80% at 80% 20%, rgba(196,75,138,0.2) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 50% at 60% 90%, rgba(59,139,212,0.12) 0%, transparent 50%);
+  }
+  .hero-arch {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(123,94,167,0.12);
+    pointer-events: none;
+  }
+  .hero-arch:nth-child(2) { width: 500px; height: 500px; border-color: rgba(123,94,167,0.08); }
+  .hero-arch:nth-child(3) { width: 300px; height: 300px; border-color: rgba(123,94,167,0.06); }
+  .hero-eyebrow {
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--lv-light); margin-bottom: 1rem; position: relative;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--lv-light); vertical-align: middle; margin-right: 10px;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(72px, 12vw, 140px);
+    line-height: 0.9; letter-spacing: 0.02em; color: #fff; position: relative;
+  }
+  .hero-title span {
+    display: block;
+    background: linear-gradient(135deg, var(--lv-light) 0%, #fff 40%, var(--tour) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero-sub {
+    font-size: 15px; color: rgba(232,228,240,0.55);
+    margin-top: 1.5rem; max-width: 460px; position: relative; font-weight: 300;
+  }
+  .hero-meta { display: flex; gap: 2rem; margin-top: 3rem; position: relative; }
+  .hero-stat-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 36px;
+    color: var(--lv-light); line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(232,228,240,0.4); margin-top: 2px;
+  }
+  .scroll-hint {
+    position: absolute; bottom: 2rem; right: 3rem;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(232,228,240,0.3); writing-mode: vertical-rl;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .scroll-hint::after {
+    content: ''; width: 1px; height: 48px;
+    background: linear-gradient(180deg, rgba(232,228,240,0.3), transparent);
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex; gap: 1.5rem; padding: 1.5rem 3rem;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 0.5px solid var(--border);
+    flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(232,228,240,0.5); font-weight: 500;
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .edit-mode-label {
+    margin-left: auto;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #6BCFA3; font-weight: 600;
+    display: none;
+    align-items: center; gap: 6px;
+  }
+  .edit-mode-label::before { content: '●'; font-size: 8px; animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  body.edit-mode .edit-mode-label { display: flex; }
+
+  /* ── MAIN ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 4rem 3rem; }
+  .section { margin-bottom: 5rem; }
+  .section-header {
+    display: flex; align-items: baseline; gap: 1.5rem;
+    margin-bottom: 2rem; border-bottom: 0.5px solid var(--border); padding-bottom: 1rem;
+  }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 0.04em; color: #fff; line-height: 1; }
+  .section-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; }
+  .timeline::before {
+    content: ''; position: absolute; left: 110px; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--lv) 0%, rgba(123,94,167,0.05) 100%);
+  }
+  .month-block { margin-bottom: 3rem; }
+  .month-tag {
+    font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.2em;
+    color: var(--lv-light); text-align: right; width: 90px; padding-right: 28px;
+    float: left; padding-top: 18px; line-height: 1;
+  }
+  .month-events { margin-left: 130px; }
+  .month-events::after { content: ''; display: table; clear: both; }
+
+  .event {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+    margin-bottom: 12px; position: relative;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s, opacity 0.3s;
+  }
+  body:not(.edit-mode) .event { cursor: pointer; }
+  body:not(.edit-mode) .event:hover { border-color: var(--lv-mid); background: var(--card2); transform: translateX(3px); }
+  .event::before {
+    content: ''; position: absolute; left: -30px; top: 22px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--dot-color, var(--lv));
+    box-shadow: 0 0 12px var(--dot-color, var(--lv));
+  }
+  .event-row { display: flex; align-items: flex-start; gap: 10px; }
+  .event-pill {
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap; margin-top: 3px; flex-shrink: 0;
+  }
+  .pill-show  { background: rgba(232,89,60,0.15);  color: #F4937A; }
+  .pill-world { background: rgba(45,155,111,0.15); color: #6BCFA3; }
+  .pill-proof { background: rgba(196,154,20,0.15); color: #E6C055; }
+  .pill-drop  { background: rgba(59,139,212,0.15); color: #7DC0EF; }
+  .pill-tour  { background: rgba(196,75,138,0.15); color: #E88DC0; }
+  .pill-finale{ background: rgba(123,94,167,0.2);  color: var(--lv-light); }
+  .event-info { flex: 1; min-width: 0; }
+  .event-title { font-size: 16px; font-weight: 600; color: #EDE9F8; line-height: 1.3; }
+  .event-date  { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .event-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .event.open .event-body { max-height: 600px; padding-top: 14px; }
+
+  .event-desc {
+    font-size: 13px; color: rgba(232,228,240,0.65); line-height: 1.65;
+    border-top: 0.5px solid var(--border); padding-top: 12px; margin-bottom: 12px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+  /* ── TOUR STRIP ── */
+  .tour-strip {
+    background: linear-gradient(135deg, rgba(196,75,138,0.08) 0%, rgba(123,94,167,0.06) 100%);
+    border: 0.5px solid rgba(196,75,138,0.2); border-radius: 16px; padding: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .tour-strip::before {
+    content: 'TOUR'; position: absolute; right: 2rem; top: 50%; transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif; font-size: 120px;
+    color: rgba(196,75,138,0.05); line-height: 1; pointer-events: none;
+  }
+  .tour-head { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--tour); margin-bottom: 4px; }
+  .tour-sub  { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+  .city-row  { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .city {
+    font-size: 12px; font-weight: 600;
+    background: rgba(196,75,138,0.1); color: var(--tour);
+    padding: 6px 16px; border-radius: 100px; border: 0.5px solid rgba(196,75,138,0.2);
+    letter-spacing: 0.04em;
+  }
+  .city.finale { background: rgba(123,94,167,0.18); color: var(--lv-light); border-color: rgba(123,94,167,0.35); }
+  .arrow { color: rgba(232,228,240,0.2); font-size: 14px; }
+  .tour-note { margin-top: 1rem; font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* ── CONTENT ENGINE ── */
+  .engine-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .engine-card {
+    background: var(--card); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 20px; position: relative; overflow: hidden;
+  }
+  .engine-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent-color); }
+  .engine-head { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .engine-items { list-style: none; }
+  .engine-items li {
+    font-size: 12px; color: rgba(232,228,240,0.5);
+    padding: 6px 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); line-height: 1.4;
+  }
+  .engine-items li:last-child { border-bottom: none; }
+  .engine-items li::before { content: '→ '; opacity: 0.3; }
+
+  /* ── CADENCE GRID ── */
+  .cadence-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  .cadence-month { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.06em; color: var(--lv-light); margin-bottom: 10px; text-align: center; }
+  .cadence-item { font-size: 10px; padding: 5px 6px; border-radius: 6px; margin-bottom: 5px; text-align: center; line-height: 1.3; font-weight: 500; letter-spacing: 0.02em; }
+  .c-show  { background: rgba(232,89,60,0.12);  color: #F4937A; }
+  .c-world { background: rgba(45,155,111,0.12); color: #6BCFA3; }
+  .c-proof { background: rgba(196,154,20,0.12); color: #E6C055; }
+  .c-drop  { background: rgba(59,139,212,0.12); color: #7DC0EF; }
+  .c-tour  { background: rgba(196,75,138,0.12); color: #E88DC0; }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 0.5px solid var(--border); padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: rgba(232,228,240,0.2); letter-spacing: 0.08em;
+  }
+  .footer strong { color: rgba(232,228,240,0.4); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-eyebrow { animation: fadeUp 0.8s ease both; }
+  .hero-title   { animation: fadeUp 0.8s 0.15s ease both; }
+  .hero-sub     { animation: fadeUp 0.8s 0.3s ease both; }
+  .hero-meta    { animation: fadeUp 0.8s 0.45s ease both; }
+
+  @media (max-width: 768px) {
+    .hero { padding: 0 1.5rem 3rem; }
+    .main { padding: 2rem 1.5rem; }
+    .legend { padding: 1rem 1.5rem; gap: 1rem; }
+    .timeline::before { display: none; }
+    .month-tag { float: none; width: auto; text-align: left; padding: 0 0 8px; }
+    .month-events { margin-left: 0; }
+    .engine-grid { grid-template-columns: 1fr; }
+    .cadence-grid { grid-template-columns: repeat(3, 1fr); }
+    .footer { flex-direction: column; gap: 8px; text-align: center; }
+    #edit-bar { bottom: 1rem; right: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="everything">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-arch"></div>
+    <div class="hero-arch"></div>
+    <div class="hero-arch"></div>
+    <div class="hero-eyebrow">CLASSICNEWWAVE & The Living Room Band</div>
+    <h1 class="hero-title">Lavender<br><span>&amp; Velvet</span></h1>
+    <p class="hero-sub">World Roadmap — April through September 2026. A hybrid DJ + live band experience built to grow.</p>
+    <div class="hero-meta">
+      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Shows Confirmed</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">5–6</div><div class="hero-stat-label">Tour Cities</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">2</div><div class="hero-stat-label">NYC Finale Nights</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">Content Lanes</div></div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </section>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <a href="cnw_dashboard.html" style="display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(232,228,240,0.35);font-weight:500;text-decoration:none;margin-right:8px;transition:color 0.15s;flex-shrink:0;" onmouseover="this.style.color='rgba(232,228,240,0.8)'" onmouseout="this.style.color='rgba(232,228,240,0.35)'">← Command Center</a>
+    <span style="width:1px;height:14px;background:rgba(232,228,240,0.1);flex-shrink:0;margin-right:8px"></span>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--show)"></span> Show Promo</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--world)"></span> World Building</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--proof)"></span> Proof of Experience</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--drop)"></span> Digital Drop</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--tour)"></span> Tour</div>
+    <div class="edit-mode-label">Edit Mode On</div>
+  </div>
+
+  <main class="main">
+
+    <!-- TIMELINE -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Timeline</h2>
+        <span class="section-label" id="timeline-hint">Click any event to expand</span>
+      </div>
+
+      <div class="timeline" id="timeline">
+
+        <!-- APRIL -->
+        <div class="month-block">
+          <div class="month-tag">APR</div>
+          <div class="month-events">
+
+            <div class="event" data-id="nyc-show" style="--dot-color: var(--show)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-show">Show</span>
+                <div class="event-info">
+                  <div class="event-title">L+V Live in NYC — Bogart House</div>
+                  <div class="event-date">April 24 · 7–10PM · 230 Bogart St, Brooklyn</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">CLASSICNEWWAVE & The Living Room Band. The first NYC moment of the year — this is where the world officially launches. Everything builds from this night.</div>
+                <div class="chips">
+                  <span class="chip">Venue walk-through</span><span class="chip">Band intros</span><span class="chip">Night-of stories</span><span class="chip">Crowd reaction clips</span><span class="chip">Recap film</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="event" data-id="clt-show" style="--dot-color: var(--show)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-show">Show</span>
+                <div class="event-info">
+                  <div class="event-title">L+V Live in Charlotte</div>
+                  <div class="event-date">April 25 · Charlotte, NC</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Back-to-back weekend. Establish that L+V is a traveling experience, not just an NYC thing. Document the road — the drive, the arrival, the room.</div>
+                <div class="chips">
+                  <span class="chip">Travel content</span><span class="chip">City POV</span><span class="chip">Night-of clips</span><span class="chip">Crowd reaction</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="event" data-id="apr-world" style="--dot-color: var(--world)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-world">World Building</span>
+                <div class="event-info">
+                  <div class="event-title">Post-Weekend: "The World of L+V" Drop</div>
+                  <div class="event-date">Late April · Social + Email</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Use the energy from both shows to launch the always-on arc. What is L+V? Why does it exist? The mythology starts here — not a promo, a manifesto.</div>
+                <div class="chips">
+                  <span class="chip">Mini-doc teaser</span><span class="chip">Behind the band</span><span class="chip">What is L+V video</span><span class="chip">Email list drop</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button class="add-event-btn" data-month="apr">+ Add April event</button>
+          </div>
+        </div>
+
+        <!-- MAY -->
+        <div class="month-block">
+          <div class="month-tag">MAY</div>
+          <div class="month-events">
+
+            <div class="event" data-id="mp3-drop" style="--dot-color: var(--drop)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-drop">Digital Drop</span>
+                <div class="event-info">
+                  <div class="event-title">Tiny Desk MP3 — Pay-to-Download Release</div>
+                  <div class="event-date">Early May · Bandcamp / Gumroad</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Drop the audio version of the Tiny Desk film as a pay-to-download MP3. Price it like a vinyl single — $3–5. Proper release: artwork, liner notes, a moment. Treat it like it matters because it does.</div>
+                <div class="chips">
+                  <span class="chip">Artwork reveal</span><span class="chip">Listening party clip</span><span class="chip">Fan download receipts</span><span class="chip">Bandcamp setup</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="event" data-id="nublu-show" style="--dot-color: var(--show)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-show">Show</span>
+                <div class="event-info">
+                  <div class="event-title">Nublu — NYC</div>
+                  <div class="event-date">May 21 · Nublu, Manhattan</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Intimate Nublu set. Different room, different energy from Bogart. Use this to show range — L+V works in a 200-cap jazz room as much as it does a warehouse.</div>
+                <div class="chips">
+                  <span class="chip">Venue contrast story</span><span class="chip">Set build content</span><span class="chip">Night-of clips</span><span class="chip">Artist feature</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="event" data-id="nublu-proof" style="--dot-color: var(--proof)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-proof">Proof of Experience</span>
+                <div class="event-info">
+                  <div class="event-title">Nublu Recap + Proof Drop</div>
+                  <div class="event-date">Late May · Social</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Real testimonials, crowd footage, emotional moments. Let the people sell the next room. This content feeds directly into the tour announcement pipeline.</div>
+                <div class="chips">
+                  <span class="chip">Crowd reaction reel</span><span class="chip">Testimonial clips</span><span class="chip">Live performance cuts</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button class="add-event-btn" data-month="may">+ Add May event</button>
+          </div>
+        </div>
+
+        <!-- JUNE -->
+        <div class="month-block">
+          <div class="month-tag">JUN</div>
+          <div class="month-events">
+
+            <div class="event" data-id="td-shoot" style="--dot-color: var(--drop)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-drop">Production</span>
+                <div class="event-info">
+                  <div class="event-title">Shoot: Next Tiny Desk Film</div>
+                  <div class="event-date">June TBD · Location TBD</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Schedule the shoot so editing is fully wrapped before tour kicks off. Keep the visual language consistent with the first film but evolve it — new song, new setting, expanded band moment. Lock the date early.</div>
+                <div class="chips">
+                  <span class="chip">Shoot day BTS</span><span class="chip">Song teaser</span><span class="chip">Director collab content</span><span class="chip">Set design reveal</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="event" data-id="tour-announce" style="--dot-color: var(--world)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-world">World Building</span>
+                <div class="event-info">
+                  <div class="event-title">Tour Announcement Campaign</div>
+                  <div class="event-date">June · Multi-platform</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">Build toward the summer run. Roll out cities one by one for maximum dwell time. Use proof-of-experience content from April/May shows as the announcement currency — let the footage do the selling.</div>
+                <div class="chips">
+                  <span class="chip">City-by-city drops</span><span class="chip">Tour poster reveal</span><span class="chip">Press push</span><span class="chip">Email list activation</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button class="add-event-btn" data-month="jun">+ Add June event</button>
+          </div>
+        </div>
+
+        <!-- JUL–SEP -->
+        <div class="month-block">
+          <div class="month-tag">JUL–SEP</div>
+          <div class="month-events">
+
+            <div class="event" data-id="summer-tour" style="--dot-color: var(--tour)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-tour">Tour</span>
+                <div class="event-info">
+                  <div class="event-title">L+V Summer Tour — 5–6 Cities</div>
+                  <div class="event-date">Late July → Early September</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">The full run. Each city gets its own moment — local press, city-specific content, on-the-ground proof. Road content is its own lane: the travel, the soundcheck, the after. Document everything.</div>
+                <div class="chips">
+                  <span class="chip">City-specific reels</span><span class="chip">Soundcheck sessions</span><span class="chip">Road diary</span><span class="chip">Local collabs</span><span class="chip">Fan moments</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="event" data-id="nyc-finale" style="--dot-color: var(--lv)">
+              <button class="done-btn" title="Mark done">✓</button>
+              <button class="delete-btn" title="Delete">×</button>
+              <div class="event-row">
+                <span class="event-pill pill-finale">Finale</span>
+                <div class="event-info">
+                  <div class="event-title">NYC 2-Night Finale</div>
+                  <div class="event-date">Early September · NYC · Venue TBD</div>
+                </div>
+              </div>
+              <div class="event-body">
+                <div class="event-desc">The capstone. Two nights, same city, different energy. Night 1 is the event. Night 2 is the celebration. Film it properly — this is the piece you're building toward all summer. The tour recap doc drops from here.</div>
+                <div class="chips">
+                  <span class="chip">Finale campaign</span><span class="chip">Two-night narrative</span><span class="chip">Full production film</span><span class="chip">Tour recap doc</span><span class="chip">Next chapter tease</span>
+                  <button class="chip-add">+ add</button>
+                </div>
+                <div class="event-notes-wrap">
+                  <div class="notes-label">Private Notes</div>
+                  <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <button class="add-event-btn" data-month="jul-sep">+ Add event</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TOUR -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Summer Tour</h2>
+        <span class="section-label">Late July → Early September</span>
+      </div>
+      <div class="tour-strip">
+        <div class="tour-head">5–6 City Run</div>
+        <div class="tour-sub">Ends in New York with a 2-night finale</div>
+        <div class="city-row">
+          <span class="city">City 1</span><span class="arrow">→</span>
+          <span class="city">City 2</span><span class="arrow">→</span>
+          <span class="city">City 3</span><span class="arrow">→</span>
+          <span class="city">City 4</span><span class="arrow">→</span>
+          <span class="city">City 5</span><span class="arrow">→</span>
+          <span class="city finale">NYC Night 1</span><span class="arrow">+</span>
+          <span class="city finale">NYC Night 2</span>
+        </div>
+        <div class="tour-note">Routing suggestions: Atlanta · DC · Philadelphia · Chicago · Houston · Boston · LA</div>
+      </div>
+    </section>
+
+    <!-- CONTENT ENGINE -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Content Engine</h2>
+        <span class="section-label">3 Lanes · Always Running</span>
+      </div>
+      <div class="engine-grid">
+        <div class="engine-card" style="--accent-color: var(--show);">
+          <div class="engine-head" style="color: #F4937A;">🎟 Show Promo</div>
+          <ul class="engine-items">
+            <li>Event announcement graphics</li><li>Countdown clips (3 / 2 / 1 day)</li>
+            <li>Setlist tease / song snippets</li><li>Venue & door time content</li>
+            <li>Ticket link pushes</li><li>Day-of Instagram Stories</li>
+            <li>Post-show "catch the replay" push</li>
+          </ul>
+        </div>
+        <div class="engine-card" style="--accent-color: var(--world);">
+          <div class="engine-head" style="color: #6BCFA3;">🌐 World Building</div>
+          <ul class="engine-items">
+            <li>What is L+V? (origin story)</li><li>Band member spotlights</li>
+            <li>Genre-blend explainer content</li><li>Behind the setlist curation</li>
+            <li>Music that inspired L+V</li><li>Studio / rehearsal process</li>
+            <li>Tour city previews</li>
+          </ul>
+        </div>
+        <div class="engine-card" style="--accent-color: var(--proof);">
+          <div class="engine-head" style="color: #E6C055;">📽 Proof of Experience</div>
+          <ul class="engine-items">
+            <li>Crowd reaction clips</li><li>Fan testimonials (UGC + curated)</li>
+            <li>Live performance highlights</li><li>Night-of recap reels</li>
+            <li>Press / media quotes</li><li>Sold-out / milestone moments</li>
+            <li>Before & after room energy</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CADENCE -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Monthly Cadence</h2>
+        <span class="section-label">Content rhythm per month</span>
+      </div>
+      <div class="cadence-grid">
+        <div class="cadence-col">
+          <div class="cadence-month">Apr</div>
+          <div class="cadence-item c-show">NYC + CLT shows</div>
+          <div class="cadence-item c-world">L+V intro drop</div>
+          <div class="cadence-item c-proof">Show recaps</div>
+        </div>
+        <div class="cadence-col">
+          <div class="cadence-month">May</div>
+          <div class="cadence-item c-drop">MP3 drop</div>
+          <div class="cadence-item c-show">Nublu 5/21</div>
+          <div class="cadence-item c-proof">Nublu recap</div>
+        </div>
+        <div class="cadence-col">
+          <div class="cadence-month">Jun</div>
+          <div class="cadence-item c-drop">Tiny Desk shoot</div>
+          <div class="cadence-item c-world">Tour announcement</div>
+          <div class="cadence-item c-world">City reveals</div>
+        </div>
+        <div class="cadence-col">
+          <div class="cadence-month">Jul</div>
+          <div class="cadence-item c-tour">Tour launch</div>
+          <div class="cadence-item c-world">Road content</div>
+          <div class="cadence-item c-proof">City POVs</div>
+        </div>
+        <div class="cadence-col">
+          <div class="cadence-month">Aug</div>
+          <div class="cadence-item c-tour">Mid-tour run</div>
+          <div class="cadence-item c-proof">Show recaps</div>
+          <div class="cadence-item c-world">NYC finale build</div>
+        </div>
+        <div class="cadence-col">
+          <div class="cadence-month">Sep</div>
+          <div class="cadence-item c-tour">NYC Finale ×2</div>
+          <div class="cadence-item c-proof">Tour recap film</div>
+          <div class="cadence-item c-world">Next chapter tease</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span><strong>Lavender &amp; Velvet</strong> — World Roadmap 2026</span>
+    <span>CLASSICNEWWAVE &amp; The Living Room Band</span>
+    <span id="last-saved-footer">Bookmark this file · edits save automatically</span>
+  </footer>
+
+</div>
+
+<!-- EDIT BAR -->
+<div id="edit-bar">
+  <span id="saved-toast">Saved ✓</span>
+  <button id="save-btn">Save now</button>
+  <button id="edit-toggle">✏ Edit</button>
+</div>
+
+<script>
+const STORE_KEY = 'lv_roadmap_v2';
+let editMode = false;
+let saveTimeout = null;
+
+// ── LOAD STATE ──
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+
+    // Restore event edits
+    if (state.events) {
+      Object.entries(state.events).forEach(([id, data]) => {
+        const el = document.querySelector(`.event[data-id="${id}"]`);
+        if (!el) return;
+        if (data.title) el.querySelector('.event-title').textContent = data.title;
+        if (data.date)  el.querySelector('.event-date').textContent  = data.date;
+        if (data.desc)  el.querySelector('.event-desc').textContent  = data.desc;
+        if (data.done)  el.classList.add('done');
+        if (data.open)  el.classList.add('open');
+        if (data.notes) el.querySelector('.event-notes').value = data.notes;
+        if (data.chips) {
+          const chipsEl = el.querySelector('.chips');
+          const addBtn  = chipsEl.querySelector('.chip-add');
+          // remove old chips
+          chipsEl.querySelectorAll('.chip').forEach(c => c.remove());
+          data.chips.forEach(text => {
+            const c = makeChip(text);
+            chipsEl.insertBefore(c, addBtn);
+          });
+        }
+      });
+    }
+
+    // Restore added events
+    if (state.addedEvents) {
+      state.addedEvents.forEach(evData => {
+        const monthEventsEl = document.querySelector(`.add-event-btn[data-month="${evData.month}"]`)?.previousElementSibling?.closest('.month-events') ||
+          document.querySelector(`.add-event-btn[data-month="${evData.month}"]`)?.parentElement;
+        if (monthEventsEl) {
+          const addBtn = monthEventsEl.querySelector('.add-event-btn');
+          const el = buildNewEvent(evData);
+          monthEventsEl.insertBefore(el, addBtn);
+        }
+      });
+    }
+
+    if (state.lastSaved) {
+      document.getElementById('last-saved-footer').textContent =
+        'Last saved ' + new Date(state.lastSaved).toLocaleString('en-US', {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+    }
+  } catch(e) { console.warn('Could not load state', e); }
+}
+
+// ── SAVE STATE ──
+function saveState() {
+  const state = { events: {}, addedEvents: [], lastSaved: Date.now() };
+
+  document.querySelectorAll('.event[data-id]').forEach(el => {
+    const id = el.dataset.id;
+    const chips = [...el.querySelectorAll('.chip')].map(c => c.textContent.trim());
+    state.events[id] = {
+      title: el.querySelector('.event-title')?.textContent,
+      date:  el.querySelector('.event-date')?.textContent,
+      desc:  el.querySelector('.event-desc')?.textContent,
+      done:  el.classList.contains('done'),
+      open:  el.classList.contains('open'),
+      notes: el.querySelector('.event-notes')?.value || '',
+      chips
+    };
+  });
+
+  // Save dynamically added events
+  document.querySelectorAll('.event[data-added]').forEach(el => {
+    const month = el.dataset.month;
+    const chips = [...el.querySelectorAll('.chip')].map(c => c.textContent.trim());
+    state.addedEvents.push({
+      month,
+      id: el.dataset.id,
+      title: el.querySelector('.event-title')?.textContent,
+      date:  el.querySelector('.event-date')?.textContent,
+      desc:  el.querySelector('.event-desc')?.textContent,
+      done:  el.classList.contains('done'),
+      open:  el.classList.contains('open'),
+      notes: el.querySelector('.event-notes')?.value || '',
+      chips
+    });
+  });
+
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+
+  // Show toast
+  const toast = document.getElementById('saved-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+
+  document.getElementById('last-saved-footer').textContent =
+    'Last saved ' + new Date().toLocaleString('en-US', {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(saveState, 800);
+}
+
+// ── EDIT MODE TOGGLE ──
+document.getElementById('edit-toggle').addEventListener('click', () => {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('edit-toggle');
+  const saveBtn = document.getElementById('save-btn');
+  btn.textContent = editMode ? '✓ Done Editing' : '✏ Edit';
+  btn.classList.toggle('active', editMode);
+  saveBtn.classList.toggle('visible', editMode);
+
+  // Toggle contenteditable on event fields
+  document.querySelectorAll('.event-title, .event-date, .event-desc').forEach(el => {
+    el.contentEditable = editMode ? 'true' : 'false';
+  });
+
+  // Update hint text
+  document.getElementById('timeline-hint').textContent =
+    editMode ? 'Edit titles, dates, descriptions — changes save automatically' : 'Click any event to expand';
+
+  if (!editMode) saveState();
+});
+
+document.getElementById('save-btn').addEventListener('click', saveState);
+
+// ── EVENT OPEN/CLOSE (only when not editing) ──
+document.addEventListener('click', e => {
+  const event = e.target.closest('.event');
+  if (!event) return;
+
+  // Done button
+  if (e.target.classList.contains('done-btn')) {
+    event.classList.toggle('done');
+    scheduleSave();
+    return;
+  }
+
+  // Delete button
+  if (e.target.classList.contains('delete-btn')) {
+    if (confirm('Remove this event?')) {
+      event.remove();
+      saveState();
+    }
+    return;
+  }
+
+  // Chip delete (edit mode)
+  if (e.target.classList.contains('chip') && editMode) {
+    if (confirm(`Remove "${e.target.textContent.trim()}"?`)) {
+      e.target.remove();
+      scheduleSave();
+    }
+    return;
+  }
+
+  // Add chip
+  if (e.target.classList.contains('chip-add')) {
+    const text = prompt('New content chip:');
+    if (text && text.trim()) {
+      const chip = makeChip(text.trim());
+      e.target.parentElement.insertBefore(chip, e.target);
+      scheduleSave();
+    }
+    return;
+  }
+
+  // Add event button
+  if (e.target.classList.contains('add-event-btn')) {
+    const title = prompt('Event title:') || 'New event';
+    const date  = prompt('Date / timing:') || 'TBD';
+    const month = e.target.dataset.month;
+    const id    = 'ev-' + Date.now();
+    const el    = buildNewEvent({ title, date, month, id, desc: 'Add a description…', chips: [] });
+    el.dataset.added = '1';
+    e.target.parentElement.insertBefore(el, e.target);
+    // Make editable immediately
+    el.querySelector('.event-title').contentEditable = editMode ? 'true' : 'false';
+    el.querySelector('.event-date').contentEditable  = editMode ? 'true' : 'false';
+    el.querySelector('.event-desc').contentEditable  = editMode ? 'true' : 'false';
+    el.classList.add('open');
+    saveState();
+    return;
+  }
+
+  // Toggle open (not in edit mode, not clicking interactive elements)
+  if (!editMode && !e.target.closest('[contenteditable]') && !e.target.closest('button') && !e.target.closest('textarea')) {
+    event.classList.toggle('open');
+    scheduleSave();
+  }
+});
+
+// ── AUTO-SAVE ON CONTENT EDITS ──
+document.addEventListener('input', e => {
+  if (e.target.contentEditable === 'true' || e.target.tagName === 'TEXTAREA') {
+    scheduleSave();
+  }
+});
+
+// ── MAKE CHIP ──
+function makeChip(text) {
+  const span = document.createElement('span');
+  span.className = 'chip';
+  span.textContent = text;
+  return span;
+}
+
+// ── BUILD NEW EVENT ──
+function buildNewEvent({ title, date, month, id, desc, chips }) {
+  const el = document.createElement('div');
+  el.className = 'event';
+  el.dataset.id = id;
+  el.dataset.month = month;
+  el.style.cssText = '--dot-color: var(--lv)';
+  el.innerHTML = `
+    <button class="done-btn" title="Mark done">✓</button>
+    <button class="delete-btn" title="Delete">×</button>
+    <div class="event-row">
+      <span class="event-pill pill-world">New</span>
+      <div class="event-info">
+        <div class="event-title">${title}</div>
+        <div class="event-date">${date}</div>
+      </div>
+    </div>
+    <div class="event-body">
+      <div class="event-desc">${desc || 'Add a description…'}</div>
+      <div class="chips">
+        ${(chips||[]).map(c => `<span class="chip">${c}</span>`).join('')}
+        <button class="chip-add">+ add</button>
+      </div>
+      <div class="event-notes-wrap">
+        <div class="notes-label">Private Notes</div>
+        <textarea class="event-notes" placeholder="Add notes, reminders, links…"></textarea>
+      </div>
+    </div>
+  `;
+  return el;
+}
+
+// ── INIT ──
+loadState();
+</script>
+</body>
+</html>

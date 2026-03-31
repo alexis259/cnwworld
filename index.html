@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNW — Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #F2EFE6;
+  --ink:      #0A0A0A;
+  --ink2:     #3A3A3A;
+  --muted:    #9A9690;
+  --border:   rgba(10,10,10,0.1);
+  --border2:  rgba(10,10,10,0.06);
+  --cnw:      #1A56FF;
+  --cnw-dark: #0F35CC;
+  --bsb:      #FF6B1A;
+  --bsb-dark: #CC4A00;
+  --lv:       #8B4FD8;
+  --lv-dark:  #6330B0;
+  --green:    #1DB954;
+  --amber:    #F59E0B;
+  --red:      #EF4444;
+  --card:     #FFFFFF;
+  --card2:    #F8F6F0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* ── LAYOUT ── */
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  grid-row: 1 / -1;
+  background: var(--ink);
+  color: #fff;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.logo-mark {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1;
+}
+.logo-mark span { color: var(--cnw); }
+.logo-sub {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-top: 4px;
+}
+
+.sidebar-nav {
+  padding: 16px 0;
+  flex: 1;
+}
+.nav-section {
+  padding: 8px 24px 4px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  font-weight: 600;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+.nav-item.active { color: #fff; border-left-color: var(--cnw); background: rgba(26,86,255,0.08); }
+.nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sidebar-time {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.time-display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.date-display {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-greeting {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.topbar-focus-wrap { flex: 1; display: flex; align-items: center; gap: 10px; }
+.focus-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.focus-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.focus-input:focus { border-color: var(--cnw); }
+.focus-input::placeholder { color: var(--muted); font-weight: 400; }
+
+.alert-bell {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background 0.15s;
+  position: relative;
+  flex-shrink: 0;
+}
+.alert-bell:hover { background: var(--bg); }
+.alert-count {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 1.5px solid var(--card);
+  display: none;
+}
+.alert-count.visible { display: block; }
+
+/* ── MAIN ── */
+.main {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border2);
+}
+.card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+.card-action {
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  background: none; border: none;
+  font-family: 'Barlow', sans-serif;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+}
+.card-action:hover { color: var(--cnw); }
+
+/* ── TOP ROW ── */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── WORLD STATUS CARDS ── */
+.world-card {
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.world-card::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.world-card.bsb { background: var(--bsb); }
+.world-card.lv  { background: var(--lv); }
+.world-card.cnw { background: var(--cnw); }
+
+.world-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.world-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #fff;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+.world-goal {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.4;
+  margin-top: 8px;
+}
+.world-next {
+  margin-top: 10px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+}
+.world-next-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  display: block;
+  margin-bottom: 1px;
+}
+
+/* ── EVENTS ── */
+.events-list { padding: 0; }
+.event-row {
+  display: grid;
+  grid-template-columns: 3px 1fr auto;
+  gap: 0 14px;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.1s;
+  cursor: default;
+}
+.event-row:last-child { border-bottom: none; }
+.event-row:hover { background: var(--bg); }
+.event-bar { height: 100%; border-radius: 2px; align-self: stretch; min-height: 36px; }
+.event-bar.bsb { background: var(--bsb); }
+.event-bar.lv  { background: var(--lv); }
+.event-bar.cnw { background: var(--cnw); }
+.event-info { min-width: 0; }
+.event-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.event-countdown {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: right;
+  line-height: 1;
+  white-space: nowrap;
+}
+.event-countdown span {
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  font-weight: 400;
+  text-align: right;
+}
+.event-countdown.urgent { color: var(--red); }
+.event-countdown.soon   { color: var(--amber); }
+.event-countdown.ok     { color: var(--green); }
+
+/* ── ADD EVENT ── */
+.add-event-row {
+  padding: 10px 20px;
+  display: none;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--border2);
+}
+.add-event-row.visible { display: flex; }
+.add-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+}
+.add-input:focus { border-color: var(--cnw); }
+.world-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+}
+.add-btn {
+  background: var(--cnw);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: var(--cnw-dark); }
+
+/* ── CONTENT HEALTH ── */
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.health-col {
+  padding: 16px 20px;
+  border-right: 1px solid var(--border2);
+}
+.health-col:last-child { border-right: none; }
+.health-world {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid currentColor;
+}
+.health-world.bsb { color: var(--bsb); border-bottom-color: var(--bsb); }
+.health-world.lv  { color: var(--lv);  border-bottom-color: var(--lv); }
+.health-world.cnw { color: var(--cnw); border-bottom-color: var(--cnw); }
+
+.health-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.health-item:last-child { border-bottom: none; }
+.health-name { font-size: 12px; color: var(--ink2); }
+.health-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 100px;
+  cursor: pointer;
+  border: none;
+  font-family: 'Barlow', sans-serif;
+  transition: opacity 0.15s;
+}
+.health-status:hover { opacity: 0.75; }
+.s-on  { background: rgba(29,185,84,0.12);  color: var(--green); }
+.s-at  { background: rgba(245,158,11,0.12); color: var(--amber); }
+.s-beh { background: rgba(239,68,68,0.12);  color: var(--red); }
+
+/* ── CREATIVE TIME ── */
+.creative-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-bottom: 1px solid var(--border2);
+}
+.creative-activity {
+  padding: 16px 20px;
+  border-right: 1px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.creative-activity:last-child { border-right: none; }
+.creative-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.creative-streak {
+  font-size: 11px;
+  color: var(--muted);
+}
+.creative-streak strong { color: var(--ink); }
+.days-row { display: flex; gap: 5px; }
+.day-dot {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  font-family: 'Barlow', sans-serif;
+}
+.day-dot:hover { border-color: var(--ink2); }
+.day-dot.done {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.day-dot.today { border-color: var(--cnw); color: var(--cnw); }
+.day-dot.today.done { background: var(--cnw); border-color: var(--cnw); color: #fff; }
+
+.creative-log-note {
+  padding: 10px 20px;
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── ALERTS PANEL ── */
+.alerts-list { padding: 0; }
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.1s;
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-item:hover { background: var(--bg); }
+.alert-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ai-urgent { background: rgba(239,68,68,0.1); }
+.ai-soon   { background: rgba(245,158,11,0.1); }
+.ai-info   { background: rgba(26,86,255,0.1); }
+.alert-text { flex: 1; min-width: 0; }
+.alert-title { font-size: 13px; font-weight: 500; color: var(--ink); }
+.alert-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.alert-dismiss {
+  background: none; border: none;
+  color: var(--muted); font-size: 16px;
+  cursor: pointer; padding: 2px;
+  line-height: 1;
+  transition: color 0.1s;
+  flex-shrink: 0;
+}
+.alert-dismiss:hover { color: var(--ink); }
+
+.no-alerts {
+  padding: 24px 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── BOTTOM ROW ── */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── PERMISSION BAR ── */
+.permission-bar {
+  background: var(--ink);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.permission-text {
+  color: #fff;
+}
+.permission-headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+.permission-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 4px;
+}
+.permission-stats {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.pstat {
+  text-align: center;
+}
+.pstat-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+.pstat-num.green { color: var(--green); }
+.pstat-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-top: 2px;
+}
+
+/* ── WORLD CARD LINK ── */
+a.world-card {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+a.world-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+a.world-card .world-link-hint {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+}
+a.world-card:hover .world-link-hint { color: rgba(255,255,255,0.8); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card, .world-card, .permission-bar {
+  animation: fadeIn 0.4s ease both;
+}
+.top-row .world-card:nth-child(1) { animation-delay: 0.05s; }
+.top-row .world-card:nth-child(2) { animation-delay: 0.1s; }
+.top-row .world-card:nth-child(3) { animation-delay: 0.15s; }
+
+/* ── EMPTY STATE ── */
+.empty-events {
+  padding: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── DELETE EVENT ── */
+.event-delete {
+  background: none; border: none;
+  color: rgba(0,0,0,0.15);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+  margin-left: 4px;
+}
+.event-delete:hover { color: var(--red); background: rgba(239,68,68,0.08); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">CNW<span>.</span></div>
+      <div class="logo-sub">Command Center</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Worlds</div>
+      <a class="nav-item active" href="#worlds">
+        <span class="nav-dot" style="background:var(--bsb)"></span>
+        Brown Sugar Bounce
+      </a>
+      <a class="nav-item" href="#worlds">
+        <span class="nav-dot" style="background:var(--lv)"></span>
+        Lavender &amp; Velvet
+      </a>
+      <a class="nav-item" href="#worlds">
+        <span class="nav-dot" style="background:var(--cnw)"></span>
+        CLASSICNEWWAVE
+      </a>
+
+      <div class="nav-section" style="margin-top:12px">Dashboard</div>
+      <a class="nav-item" href="#events">📅 Upcoming Events</a>
+      <a class="nav-item" href="#health">📊 Content Health</a>
+      <a class="nav-item" href="#creative">🥁 Creative Time</a>
+      <a class="nav-item" href="#alerts">🔔 Alerts</a>
+
+      <div class="nav-section" style="margin-top:12px">Open Dashboards</div>
+      <a class="nav-item" href="lv_roadmap_v2.html" target="_blank">
+        <span class="nav-dot" style="background:var(--lv)"></span>
+        ↗ L+V Roadmap
+      </a>
+    </nav>
+
+    <div class="sidebar-time">
+      <div class="time-display" id="clock">--:--</div>
+      <div class="date-display" id="dateDisplay">Loading...</div>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-greeting" id="greeting">Good morning</div>
+    <div class="topbar-focus-wrap">
+      <span class="focus-label">Today's focus →</span>
+      <input
+        class="focus-input"
+        id="focusInput"
+        type="text"
+        placeholder="What's the one thing that matters today?"
+        maxlength="120"
+      >
+    </div>
+    <button class="alert-bell" id="alertBell" onclick="scrollToAlerts()">
+      🔔
+      <span class="alert-count" id="alertCount"></span>
+    </button>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WORLD STATUS -->
+    <div class="top-row" id="worlds">
+      <a class="world-card bsb" href="bsb_dashboard.html" target="_blank">
+        <span class="world-link-hint">↗ Open</span>
+        <div>
+          <div class="world-label">Lifestyle / Events</div>
+          <div class="world-name">Brown Sugar<br>Bounce</div>
+          <div class="world-goal">Expand footprint · build cultural moments · drive revenue through events, merch &amp; community</div>
+        </div>
+        <div class="world-next">
+          <span class="world-next-label">Next up</span>
+          <span id="bsb-next">Bounce Block Party · Jun 19</span>
+        </div>
+      </a>
+
+      <a class="world-card lv" href="lv_roadmap_v2.html" target="_blank">
+        <span class="world-link-hint">↗ Open</span>
+        <div>
+          <div class="world-label">Live Music Experience</div>
+          <div class="world-name">Lavender<br>&amp; Velvet</div>
+          <div class="world-goal">Grow audience through consistent shows &amp; content · increase revenue through ticketing &amp; partnerships</div>
+        </div>
+        <div class="world-next">
+          <span class="world-next-label">Next up</span>
+          <span id="lv-next">NYC Bogart House · Apr 24</span>
+        </div>
+      </a>
+
+      <a class="world-card cnw" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+        <span class="world-link-hint">↑ Top</span>
+        <div>
+          <div class="world-label">Awareness &amp; Bookings</div>
+          <div class="world-name">CLASSIC<br>NEWWAVE</div>
+          <div class="world-goal">Always-on content engine · grow visibility · fuel brand storytelling · drive DJ bookings</div>
+        </div>
+        <div class="world-next">
+          <span class="world-next-label">Next up</span>
+          <span id="cnw-next">Monthly photoshoot · Apr</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- EVENTS + ALERTS ROW -->
+    <div class="bottom-row" id="events">
+
+      <!-- UPCOMING EVENTS -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Upcoming Events</span>
+          <button class="card-action" onclick="toggleAddEvent()">+ Add event</button>
+        </div>
+        <div class="events-list" id="eventsList"></div>
+        <div class="add-event-row" id="addEventRow">
+          <input class="add-input" id="newEventName" placeholder="Event name…" />
+          <input class="add-input" id="newEventDate" type="date" style="width:130px" />
+          <select class="world-select" id="newEventWorld">
+            <option value="bsb">BSB</option>
+            <option value="lv">L+V</option>
+            <option value="cnw">CNW</option>
+          </select>
+          <button class="add-btn" onclick="addEvent()">Add</button>
+        </div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="card" id="alerts">
+        <div class="card-header">
+          <span class="card-title">Alerts &amp; Reminders</span>
+          <button class="card-action" onclick="clearAllAlerts()">Clear all</button>
+        </div>
+        <div class="alerts-list" id="alertsList"></div>
+      </div>
+
+    </div>
+
+    <!-- CONTENT HEALTH -->
+    <div class="card" id="health">
+      <div class="card-header">
+        <span class="card-title">Content Health</span>
+        <span style="font-size:11px;color:var(--muted)">Click status to cycle · resets monthly</span>
+      </div>
+      <div class="health-grid">
+        <div class="health-col">
+          <div class="health-world bsb">BSB</div>
+          <div id="bsb-health"></div>
+        </div>
+        <div class="health-col">
+          <div class="health-world lv">L+V</div>
+          <div id="lv-health"></div>
+        </div>
+        <div class="health-col">
+          <div class="health-world cnw">CNW</div>
+          <div id="cnw-health"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATIVE TIME -->
+    <div class="card" id="creative">
+      <div class="card-header">
+        <span class="card-title">Creative Time This Week</span>
+        <button class="card-action" onclick="resetCreativeWeek()">Reset week</button>
+      </div>
+      <div class="creative-grid" id="creativeGrid"></div>
+      <div class="creative-log-note" id="creativeNote"></div>
+    </div>
+
+    <!-- PERMISSION BAR -->
+    <div class="permission-bar" id="permissionBar">
+      <div class="permission-text">
+        <div class="permission-headline" id="permissionHeadline">You've earned the creative time.</div>
+        <div class="permission-sub" id="permissionSub">Track your sessions above — the data fights the "can't afford a break" voice.</div>
+      </div>
+      <div class="permission-stats">
+        <div class="pstat">
+          <div class="pstat-num green" id="totalSessions">0</div>
+          <div class="pstat-label">Sessions<br>This Week</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-num" id="streakDays">0</div>
+          <div class="pstat-label">Day<br>Streak</div>
+        </div>
+        <div class="pstat">
+          <div class="pstat-num" id="daysUntilNextShow">—</div>
+          <div class="pstat-label">Days to<br>Next Show</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const STORE = 'cnw_dash_v1';
+
+// ── DEFAULT DATA ──
+const DEFAULT = {
+  focus: '',
+  events: [
+    { id: 'e1', name: 'L+V NYC — Bogart House', date: '2026-04-24', world: 'lv' },
+    { id: 'e2', name: 'L+V Charlotte', date: '2026-04-25', world: 'lv' },
+    { id: 'e3', name: 'Nublu — NYC', date: '2026-05-21', world: 'lv' },
+    { id: 'e4', name: 'Bounce Block Party', date: '2026-06-19', world: 'bsb' },
+    { id: 'e5', name: 'Tiny Desk Film Shoot', date: '2026-06-15', world: 'cnw' },
+    { id: 'e6', name: 'Bounce Family Reunion', date: '2026-08-28', world: 'bsb' },
+    { id: 'e7', name: 'L+V Summer Tour Kickoff', date: '2026-07-25', world: 'lv' },
+    { id: 'e8', name: 'NYC 2-Night Finale — Night 1', date: '2026-09-05', world: 'lv' },
+  ],
+  health: {
+    bsb: { 'Event promo': 'on', 'Always-on content': 'on', 'Merch push': 'at', 'Mini-doc series': 'beh', 'Community portraits': 'at' },
+    lv:  { 'Show promo': 'on', 'World building': 'on', 'Proof of experience': 'at', 'Rehearsal content': 'beh', 'Beauty collab': 'at' },
+    cnw: { 'Photoshoot (1x/mo)': 'on', 'MPC / finger drums (1x/mo)': 'at', 'Music To series': 'beh', 'BoomBoom Sessions': 'at', 'Always-on drops': 'on' },
+  },
+  creative: {
+    activities: ['Drums', 'DJ Practice', 'Music Production'],
+    // week data: { 'DRUMS': { 'Mon': true, ... }, ... }
+    weekData: {},
+    weekStart: null,
+  },
+  alerts: [
+    { id: 'a1', type: 'urgent', title: 'L+V NYC show in 25 days', sub: 'Finalize guest list + promo push', icon: '🔴' },
+    { id: 'a2', type: 'soon',   title: 'Tiny Desk MP3 drop — Early May', sub: 'Set up Bandcamp page + artwork', icon: '🟡' },
+    { id: 'a3', type: 'info',   title: 'Tour cities still TBD', sub: 'Lock routing before June announcement', icon: '🔵' },
+  ],
+};
+
+// ── STATE ──
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (raw) {
+      const s = JSON.parse(raw);
+      // merge missing keys
+      if (!s.creative) s.creative = JSON.parse(JSON.stringify(DEFAULT.creative));
+      if (!s.alerts)   s.alerts   = JSON.parse(JSON.stringify(DEFAULT.alerts));
+      return s;
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+
+function save() {
+  localStorage.setItem(STORE, JSON.stringify(state));
+}
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('dateDisplay').textContent =
+    `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()} ${now.getFullYear()}`;
+
+  const greeting = document.getElementById('greeting');
+  const hr = now.getHours();
+  greeting.textContent = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── FOCUS ──
+const focusInput = document.getElementById('focusInput');
+focusInput.value = state.focus || '';
+focusInput.addEventListener('input', () => {
+  state.focus = focusInput.value;
+  save();
+});
+
+// ── EVENTS ──
+function daysUntil(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.ceil((target - today) / 86400000);
+}
+
+function countdownClass(days) {
+  if (days <= 7)  return 'urgent';
+  if (days <= 21) return 'soon';
+  return 'ok';
+}
+
+function renderEvents() {
+  const list = document.getElementById('eventsList');
+  const sorted = [...state.events]
+    .map(e => ({ ...e, days: daysUntil(e.date) }))
+    .filter(e => e.days >= 0)
+    .sort((a,b) => a.days - b.days)
+    .slice(0, 8);
+
+  if (sorted.length === 0) {
+    list.innerHTML = '<div class="empty-events">No upcoming events — add one above</div>';
+    return;
+  }
+
+  list.innerHTML = sorted.map(e => {
+    const cls = countdownClass(e.days);
+    const label = e.days === 0 ? 'TODAY' : e.days === 1 ? '1 DAY' : `${e.days} DAYS`;
+    const dateStr = new Date(e.date + 'T00:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    return `
+      <div class="event-row">
+        <div class="event-bar ${e.world}"></div>
+        <div class="event-info">
+          <div class="event-name">${e.name}</div>
+          <div class="event-meta">${e.world.toUpperCase()} · ${dateStr}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div class="event-countdown ${cls}">${label}<span>away</span></div>
+          <button class="event-delete" onclick="deleteEvent('${e.id}')" title="Remove">×</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Update world next-up
+  const bsbNext = sorted.find(e => e.world === 'bsb');
+  const lvNext  = sorted.find(e => e.world === 'lv');
+  const cnwNext = sorted.find(e => e.world === 'cnw');
+  if (bsbNext) document.getElementById('bsb-next').textContent = `${bsbNext.name} · ${new Date(bsbNext.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+  if (lvNext)  document.getElementById('lv-next').textContent  = `${lvNext.name} · ${new Date(lvNext.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+  if (cnwNext) document.getElementById('cnw-next').textContent = `${cnwNext.name} · ${new Date(cnwNext.date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+
+  // Update days-to-next-show
+  const nextShow = sorted.find(e => e.world === 'lv' || e.world === 'bsb');
+  document.getElementById('daysUntilNextShow').textContent = nextShow ? nextShow.days : '—';
+}
+
+function deleteEvent(id) {
+  state.events = state.events.filter(e => e.id !== id);
+  save(); renderEvents(); renderAlerts();
+}
+
+function toggleAddEvent() {
+  const row = document.getElementById('addEventRow');
+  row.classList.toggle('visible');
+  if (row.classList.contains('visible')) document.getElementById('newEventName').focus();
+}
+
+function addEvent() {
+  const name  = document.getElementById('newEventName').value.trim();
+  const date  = document.getElementById('newEventDate').value;
+  const world = document.getElementById('newEventWorld').value;
+  if (!name || !date) return;
+  state.events.push({ id: 'e' + Date.now(), name, date, world });
+  document.getElementById('newEventName').value = '';
+  document.getElementById('newEventDate').value = '';
+  save(); renderEvents();
+  document.getElementById('addEventRow').classList.remove('visible');
+}
+
+// ── CONTENT HEALTH ──
+const statusCycle = { 'on': 'at', 'at': 'beh', 'beh': 'on' };
+const statusLabel = { 'on': 'On Track', 'at': 'At Risk', 'beh': 'Behind' };
+const statusClass = { 'on': 's-on', 'at': 's-at', 'beh': 's-beh' };
+
+function renderHealth() {
+  ['bsb','lv','cnw'].forEach(world => {
+    const container = document.getElementById(`${world}-health`);
+    const items = state.health[world];
+    container.innerHTML = Object.entries(items).map(([name, status]) => `
+      <div class="health-item">
+        <span class="health-name">${name}</span>
+        <button class="health-status ${statusClass[status]}"
+          onclick="cycleHealth('${world}','${name}')">${statusLabel[status]}</button>
+      </div>`).join('');
+  });
+}
+
+function cycleHealth(world, name) {
+  state.health[world][name] = statusCycle[state.health[world][name]];
+  save(); renderHealth();
+}
+
+// ── CREATIVE TIME ──
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function getWeekStart() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon = new Date(now);
+  mon.setDate(now.getDate() + diff);
+  mon.setHours(0,0,0,0);
+  return mon.toISOString().split('T')[0];
+}
+
+function getTodayDayIndex() {
+  const day = new Date().getDay();
+  return day === 0 ? 6 : day - 1; // Mon=0 ... Sun=6
+}
+
+function renderCreative() {
+  const weekStart = getWeekStart();
+  // Reset if new week
+  if (state.creative.weekStart !== weekStart) {
+    state.creative.weekStart = weekStart;
+    state.creative.weekData = {};
+    save();
+  }
+
+  const grid = document.getElementById('creativeGrid');
+  const todayIdx = getTodayDayIndex();
+
+  grid.innerHTML = state.creative.activities.map(act => {
+    const key = act.toUpperCase();
+    const weekData = state.creative.weekData[key] || {};
+    const doneCount = Object.values(weekData).filter(Boolean).length;
+
+    const dotsHtml = DAYS.map((d, i) => {
+      const done = !!weekData[d];
+      const isToday = i === todayIdx;
+      const cls = `day-dot${done ? ' done' : ''}${isToday ? ' today' : ''}`;
+      return `<button class="${cls}" onclick="toggleCreative('${key}','${d}')" title="${d}">${d}</button>`;
+    }).join('');
+
+    return `
+      <div class="creative-activity">
+        <div class="creative-name">${act}</div>
+        <div class="creative-streak">
+          <strong>${doneCount}</strong> of 7 days this week
+        </div>
+        <div class="days-row">${dotsHtml}</div>
+      </div>`;
+  }).join('');
+
+  // Update permission bar
+  updatePermissionBar();
+}
+
+function toggleCreative(key, day) {
+  if (!state.creative.weekData[key]) state.creative.weekData[key] = {};
+  state.creative.weekData[key][day] = !state.creative.weekData[key][day];
+  save(); renderCreative();
+}
+
+function resetCreativeWeek() {
+  if (confirm('Reset this week\'s creative log?')) {
+    state.creative.weekData = {};
+    save(); renderCreative();
+  }
+}
+
+function updatePermissionBar() {
+  let total = 0;
+  state.creative.activities.forEach(act => {
+    const key = act.toUpperCase();
+    const weekData = state.creative.weekData[key] || {};
+    total += Object.values(weekData).filter(Boolean).length;
+  });
+
+  document.getElementById('totalSessions').textContent = total;
+
+  // Streak: consecutive days with at least one session
+  let streak = 0;
+  const todayIdx = getTodayDayIndex();
+  for (let i = todayIdx; i >= 0; i--) {
+    const day = DAYS[i];
+    const hasSession = state.creative.activities.some(act => {
+      const key = act.toUpperCase();
+      return state.creative.weekData[key]?.[day];
+    });
+    if (hasSession) streak++;
+    else break;
+  }
+  document.getElementById('streakDays').textContent = streak;
+
+  // Permission headline
+  const headline = document.getElementById('permissionHeadline');
+  const sub = document.getElementById('permissionSub');
+  if (total === 0) {
+    headline.textContent = 'Block your creative time first.';
+    sub.textContent = 'Tap a day above to log a session. Admin waits.';
+  } else if (total <= 2) {
+    headline.textContent = 'Good start. Keep the momentum.';
+    sub.textContent = 'Every session logged is proof you\'re building, not just planning.';
+  } else if (total <= 5) {
+    headline.textContent = 'You\'re doing the work.';
+    sub.textContent = 'The dashboard shows it. You can afford the break.';
+  } else {
+    headline.textContent = 'This is what consistency looks like.';
+    sub.textContent = 'You\'ve earned every creative session. The admin will get done.';
+  }
+}
+
+// ── ALERTS ──
+function renderAlerts() {
+  const list = document.getElementById('alertsList');
+  const count = document.getElementById('alertCount');
+
+  // Auto-generate event alerts
+  const autoAlerts = state.events
+    .map(e => ({ ...e, days: daysUntil(e.date) }))
+    .filter(e => e.days >= 0 && e.days <= 14)
+    .map(e => ({
+      id: 'auto-' + e.id,
+      type: e.days <= 3 ? 'urgent' : 'soon',
+      title: `${e.name} in ${e.days === 0 ? 'TODAY' : e.days + ' days'}`,
+      sub: `${e.world.toUpperCase()} · ${new Date(e.date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric'})}`,
+      icon: e.days <= 3 ? '🔴' : '🟡',
+      auto: true,
+    }));
+
+  const all = [...autoAlerts, ...state.alerts];
+
+  if (all.length === 0) {
+    list.innerHTML = '<div class="no-alerts">No active alerts — you\'re good.</div>';
+    count.classList.remove('visible');
+    return;
+  }
+
+  count.classList.add('visible');
+  list.innerHTML = all.map(a => `
+    <div class="alert-item" id="alert-${a.id}">
+      <div class="alert-icon ${a.type === 'urgent' ? 'ai-urgent' : a.type === 'soon' ? 'ai-soon' : 'ai-info'}">${a.icon}</div>
+      <div class="alert-text">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-sub">${a.sub}</div>
+      </div>
+      ${a.auto ? '' : `<button class="alert-dismiss" onclick="dismissAlert('${a.id}')" title="Dismiss">×</button>`}
+    </div>`).join('');
+}
+
+function dismissAlert(id) {
+  state.alerts = state.alerts.filter(a => a.id !== id);
+  save(); renderAlerts();
+}
+
+function clearAllAlerts() {
+  state.alerts = [];
+  save(); renderAlerts();
+}
+
+function scrollToAlerts() {
+  document.getElementById('alerts').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── KEYBOARD SHORTCUT ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    focusInput.focus();
+    focusInput.select();
+  }
+});
+
+// ── FOCUS INPUT ON ENTER ──
+focusInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') focusInput.blur();
+});
+
+// ── INIT ──
+renderEvents();
+renderHealth();
+renderCreative();
+renderAlerts();
+
+// Refresh every minute
+setInterval(() => {
+  renderEvents();
+  renderAlerts();
+}, 60000);
+</script>
+</body>
+</html>
