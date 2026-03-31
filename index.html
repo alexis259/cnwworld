@@ -997,10 +997,9 @@ async function syncFromWorlds() {
   } catch(e) {}
   if (!bsbData) bsbData = _readLocalHealth('bsb_dash_v1');
 
-  if (bsbData?.health) {
-    const flat = {};
-    Object.values(bsbData.health).forEach(col => Object.assign(flat, col));
-    if (Object.keys(flat).length) { state.health.bsb = flat; updated = true; }
+  if (bsbData?.health?.content) {
+    state.health.bsb = bsbData.health.content;
+    updated = true;
   }
 
   // ── LV ──
