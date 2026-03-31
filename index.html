@@ -940,14 +940,24 @@ const DEFAULT = {
 };
 
 // ── STATE ──
-let state = loadState();
+let state;
 
-function loadState() {
+async function loadState() {
+  try {
+    const res = await fetch('/.netlify/functions/getData?world=cnw');
+    if (res.ok) {
+      const s = await res.json();
+      if (!s.creative) s.creative = JSON.parse(JSON.stringify(DEFAULT.creative));
+      if (!s.alerts)   s.alerts   = JSON.parse(JSON.stringify(DEFAULT.alerts));
+      localStorage.setItem(STORE, JSON.stringify(s));
+      return s;
+    }
+  } catch(e) {}
+  // Offline fallback
   try {
     const raw = localStorage.getItem(STORE);
     if (raw) {
       const s = JSON.parse(raw);
-      // merge missing keys
       if (!s.creative) s.creative = JSON.parse(JSON.stringify(DEFAULT.creative));
       if (!s.alerts)   s.alerts   = JSON.parse(JSON.stringify(DEFAULT.alerts));
       return s;
@@ -956,8 +966,63 @@ function loadState() {
   return JSON.parse(JSON.stringify(DEFAULT));
 }
 
+let _saveTimer = null;
 function save() {
   localStorage.setItem(STORE, JSON.stringify(state));
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    fetch('/.netlify/functions/saveData', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ world: 'cnw', payload: state }),
+    }).catch(() => {});
+  }, 800);
+}
+
+async function syncFromWorlds() {
+  try {
+    const [bsbRes, lvRes] = await Promise.all([
+      fetch('/.netlify/functions/getData?world=bsb'),
+      fetch('/.netlify/functions/getData?world=lv'),
+    ]);
+    let updated = false;
+
+    if (bsbRes.ok) {
+      const bsbData = await bsbRes.json();
+      if (bsbData.health) {
+        const flat = {};
+        Object.values(bsbData.health).forEach(col => Object.assign(flat, col));
+        if (Object.keys(flat).length) { state.health.bsb = flat; updated = true; }
+      }
+    }
+
+    if (lvRes.ok) {
+      const lvData = await lvRes.json();
+      if (lvData.health?.lv) {
+        state.health.lv = lvData.health.lv;
+        updated = true;
+      } else if (lvData.events) {
+        const healthFromEvents = {};
+        Object.values(lvData.events).forEach(ev => {
+          if (ev.title) healthFromEvents[ev.title] = ev.done ? 'on' : 'beh';
+        });
+        if (Object.keys(healthFromEvents).length) {
+          state.health.lv = healthFromEvents;
+          updated = true;
+        }
+      }
+    }
+
+    if (updated) {
+      renderHealth();
+      const subtitle = document.querySelector('#health .card-header span:last-child');
+      if (subtitle) {
+        const orig = subtitle.textContent;
+        subtitle.textContent = 'Synced ✓';
+        setTimeout(() => { subtitle.textContent = orig; }, 2000);
+      }
+    }
+  } catch(e) {}
 }
 
 // ── CLOCK ──
@@ -981,7 +1046,6 @@ updateClock();
 
 // ── FOCUS ──
 const focusInput = document.getElementById('focusInput');
-focusInput.value = state.focus || '';
 focusInput.addEventListener('input', () => {
   state.focus = focusInput.value;
   save();
@@ -1268,16 +1332,25 @@ focusInput.addEventListener('keydown', e => {
 });
 
 // ── INIT ──
-renderEvents();
-renderHealth();
-renderCreative();
-renderAlerts();
+async function init() {
+  state = await loadState();
+  focusInput.value = state.focus || '';
+  renderEvents();
+  renderHealth();
+  renderCreative();
+  renderAlerts();
+  syncFromWorlds();
+}
+init();
 
 // Refresh every minute
 setInterval(() => {
   renderEvents();
   renderAlerts();
 }, 60000);
+
+// Sync from BSB + LV every 60 seconds
+setInterval(syncFromWorlds, 60000);
 </script>
 </body>
 </html>

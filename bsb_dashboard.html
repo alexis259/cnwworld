@@ -826,12 +826,21 @@ function loadState() {
   return JSON.parse(JSON.stringify(DEFAULT));
 }
 
+let _saveTimer = null;
 function save() {
   localStorage.setItem(STORE, JSON.stringify(state));
   const t = document.getElementById('toast');
   t.classList.add('show');
   clearTimeout(window._toastTimer);
   window._toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    fetch('/.netlify/functions/saveData', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ world: 'bsb', payload: state }),
+    }).catch(() => {});
+  }, 800);
 }
 
 // ── DATE ──
