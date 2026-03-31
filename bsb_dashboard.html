@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brown Sugar Bounce — Dashboard 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #FDF6EC;
+  --ink:      #1A0D00;
+  --ink2:     #3D2000;
+  --muted:    #A08060;
+  --border:   rgba(26,13,0,0.1);
+  --border2:  rgba(26,13,0,0.06);
+  --orange:   #F45D00;
+  --amber:    #F5A623;
+  --amber2:   #E8890A;
+  --yellow:   #FFD166;
+  --card:     #FFFFFF;
+  --card2:    #FFF8F0;
+  --green:    #1A9E5C;
+  --warn:     #E07B00;
+  --red:      #D93025;
+  --cream:    #FFF3E0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Archivo', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(245,166,35,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 10% 90%, rgba(244,93,0,0.06) 0%, transparent 60%);
+}
+
+.everything { position: relative; z-index: 1; }
+
+/* ── HERO HEADER ── */
+.hero {
+  background: var(--orange);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: 'BSB';
+  position: absolute;
+  right: -20px; top: -30px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 200px;
+  color: rgba(255,255,255,0.06);
+  line-height: 1;
+  pointer-events: none;
+  letter-spacing: -0.04em;
+}
+.hero-inner {
+  padding: 28px 36px 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.hero-left { }
+.hero-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color 0.15s;
+}
+.hero-back:hover { color: rgba(255,255,255,0.9); }
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.hero-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  color: #fff;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.hero-title span { color: var(--yellow); }
+.hero-goal {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 12px;
+  max-width: 500px;
+  font-weight: 300;
+  line-height: 1.5;
+}
+.hero-right {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.hero-stat {
+  text-align: right;
+}
+.hero-stat-num {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 40px;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.hero-stat-num.yellow { color: var(--yellow); }
+.hero-stat-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+
+/* ── NAV BAR ── */
+.navbar {
+  background: var(--ink);
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.navbar::-webkit-scrollbar { display: none; }
+.nav-link {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  text-decoration: none;
+  padding: 14px 16px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.nav-link:hover { color: rgba(255,255,255,0.7); }
+.nav-link.active { color: var(--amber); border-bottom-color: var(--amber); }
+.nav-spacer { flex: 1; }
+.nav-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px 14px;
+  border-bottom: 1px solid var(--border2);
+}
+.card-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+.card-action {
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Archivo', sans-serif;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+}
+.card-action:hover { color: var(--orange); }
+
+/* ── EVENTS GRID ── */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.event-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.event-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,13,0,0.08); }
+
+.event-card-top {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border2);
+  position: relative;
+}
+.event-card-top::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--orange);
+}
+.event-countdown-badge {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 100px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.badge-urgent { background: rgba(217,48,37,0.1);  color: var(--red); }
+.badge-soon   { background: rgba(224,123,0,0.1);  color: var(--warn); }
+.badge-ok     { background: rgba(26,158,92,0.1);  color: var(--green); }
+.badge-tbd    { background: rgba(160,128,96,0.1); color: var(--muted); }
+
+.event-card-name {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.event-card-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.event-card-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+
+/* Status rows */
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.status-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.status-pill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 100px;
+  cursor: pointer;
+  border: none;
+  font-family: 'Archivo', sans-serif;
+  transition: opacity 0.15s;
+}
+.status-pill:hover { opacity: 0.75; }
+.sp-done    { background: rgba(26,158,92,0.1);  color: var(--green); }
+.sp-pending { background: rgba(245,166,35,0.15); color: var(--warn); }
+.sp-needed  { background: rgba(217,48,37,0.1);  color: var(--red); }
+.sp-na      { background: rgba(160,128,96,0.1); color: var(--muted); }
+
+/* Budget bar */
+.budget-wrap { }
+.budget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.budget-label { font-size: 11px; color: var(--muted); }
+.budget-nums { font-size: 12px; font-weight: 600; color: var(--ink); }
+.budget-bar-bg {
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.budget-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--orange);
+  transition: width 0.4s ease;
+}
+.budget-inputs {
+  display: none;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+.budget-inputs.visible { display: flex; }
+.budget-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+}
+.budget-input:focus { border-color: var(--orange); }
+.budget-save {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Archivo', sans-serif;
+}
+
+.event-card-notes {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  color: var(--ink2);
+  resize: vertical;
+  min-height: 52px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.event-card-notes:focus { border-color: var(--orange); }
+
+.event-delete-btn {
+  background: none;
+  border: none;
+  color: rgba(26,13,0,0.2);
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  font-family: 'Archivo', sans-serif;
+  transition: color 0.15s;
+  padding: 0;
+  align-self: flex-end;
+}
+.event-delete-btn:hover { color: var(--red); }
+
+/* Add event card */
+.add-event-card {
+  background: transparent;
+  border: 1.5px dashed rgba(26,13,0,0.15);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 160px;
+  justify-content: center;
+}
+.add-event-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.add-form { display: flex; flex-direction: column; gap: 8px; }
+.add-input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: 'Archivo', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.add-input:focus { border-color: var(--orange); }
+.add-row { display: flex; gap: 8px; }
+.add-btn {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: var(--ink); }
+
+/* ── CONTENT HEALTH ── */
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 0;
+}
+.health-col {
+  padding: 18px 22px;
+  border-right: 1px solid var(--border2);
+}
+.health-col:last-child { border-right: none; }
+.health-col-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--orange);
+}
+.health-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.health-item:last-child { border-bottom: none; }
+.health-name { font-size: 12px; color: var(--ink2); }
+.health-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 100px;
+  cursor: pointer;
+  border: none;
+  font-family: 'Archivo', sans-serif;
+  transition: opacity 0.15s;
+}
+.health-status:hover { opacity: 0.75; }
+.s-on  { background: rgba(26,158,92,0.1);  color: var(--green); }
+.s-at  { background: rgba(224,123,0,0.1);  color: var(--warn); }
+.s-beh { background: rgba(217,48,37,0.1);  color: var(--red); }
+
+/* ── MERCH TRACKER ── */
+.merch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--border2);
+}
+.merch-item {
+  padding: 16px 20px;
+  border-right: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  position: relative;
+}
+.merch-item:nth-child(n) { border-right: 1px solid var(--border2); }
+.merch-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+  padding-right: 20px;
+}
+.merch-status-badge {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.ms-live    { background: rgba(26,158,92,0.1);  color: var(--green); }
+.ms-coming  { background: rgba(245,166,35,0.15); color: var(--warn); }
+.ms-concept { background: rgba(160,128,96,0.1); color: var(--muted); }
+
+.merch-detail { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.merch-delete {
+  position: absolute; top: 12px; right: 12px;
+  background: none; border: none;
+  color: rgba(26,13,0,0.15); font-size: 14px;
+  cursor: pointer; transition: color 0.15s;
+}
+.merch-delete:hover { color: var(--red); }
+
+.merch-add-btn {
+  padding: 16px 20px;
+  border-right: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  cursor: pointer;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: left;
+  transition: color 0.15s, background 0.15s;
+}
+.merch-add-btn:hover { color: var(--orange); background: var(--cream); }
+
+/* ── COLLAB PIPELINE ── */
+.collab-list { padding: 0; }
+.collab-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.1s;
+}
+.collab-row:last-child { border-bottom: none; }
+.collab-row:hover { background: var(--cream); }
+.collab-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.collab-type { font-size: 11px; color: var(--muted); }
+.collab-status {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  padding: 3px 10px; border-radius: 100px;
+  cursor: pointer; border: none;
+  font-family: 'Archivo', sans-serif;
+  transition: opacity 0.15s;
+}
+.collab-status:hover { opacity: 0.75; }
+.collab-delete {
+  background: none; border: none;
+  color: rgba(26,13,0,0.15); font-size: 14px;
+  cursor: pointer; transition: color 0.15s;
+}
+.collab-delete:hover { color: var(--red); }
+
+.collab-add-row {
+  display: none;
+  padding: 12px 22px;
+  gap: 8px;
+  align-items: center;
+  border-top: 1px solid var(--border2);
+  flex-wrap: wrap;
+}
+.collab-add-row.visible { display: flex; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card, .event-card { animation: fadeUp 0.35s ease both; }
+.events-grid .event-card:nth-child(1) { animation-delay: 0.05s; }
+.events-grid .event-card:nth-child(2) { animation-delay: 0.1s; }
+.events-grid .event-card:nth-child(3) { animation-delay: 0.15s; }
+.events-grid .event-card:nth-child(4) { animation-delay: 0.2s; }
+
+/* ── EMPTY STATE ── */
+.empty { padding: 24px; text-align: center; font-size: 12px; color: var(--muted); font-style: italic; }
+
+/* ── SAVED TOAST ── */
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--ink); color: #fff;
+  border-radius: 100px; padding: 10px 20px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999;
+}
+#toast.show { opacity: 1; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(26,13,0,0.12); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="everything">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <a class="hero-back" href="index.html">← Command Center</a>
+        <div class="hero-eyebrow">Lifestyle / Events · 2026</div>
+        <h1 class="hero-title">Brown Sugar<br><span>Bounce</span></h1>
+        <p class="hero-goal">Establish Bounce as a staple lifestyle brand by expanding its footprint, building consistent cultural moments, and driving revenue through events, merch, and community activations.</p>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat">
+          <div class="hero-stat-num yellow" id="heroEventCount">5</div>
+          <div class="hero-stat-label">Events<br>This Year</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" id="heroDaysNext">—</div>
+          <div class="hero-stat-label">Days to<br>Next Event</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-link active" href="#events">Events</a>
+    <a class="nav-link" href="#health">Content</a>
+    <a class="nav-link" href="#merch">Merch</a>
+    <a class="nav-link" href="#collabs">Collabs</a>
+    <div class="nav-spacer"></div>
+    <div class="nav-date" id="navDate"></div>
+  </nav>
+
+  <main class="main">
+
+    <!-- EVENTS -->
+    <section id="events">
+      <div class="section-label">Events & Status</div>
+      <div class="events-grid" id="eventsGrid"></div>
+    </section>
+
+    <!-- CONTENT HEALTH -->
+    <section id="health">
+      <div class="section-label">Content Health</div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Always-On Content</span>
+          <span style="font-size:11px;color:var(--muted)">Click status to cycle</span>
+        </div>
+        <div class="health-grid">
+          <div class="health-col">
+            <div class="health-col-title">Events</div>
+            <div id="health-events"></div>
+          </div>
+          <div class="health-col">
+            <div class="health-col-title">Content</div>
+            <div id="health-content"></div>
+          </div>
+          <div class="health-col">
+            <div class="health-col-title">Community</div>
+            <div id="health-community"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MERCH -->
+    <section id="merch">
+      <div class="section-label">Merch — Shopify Tracker</div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Live & Upcoming Drops</span>
+          <button class="card-action" onclick="showMerchAdd()">+ Add drop</button>
+        </div>
+        <div class="merch-grid" id="merchGrid"></div>
+      </div>
+    </section>
+
+    <!-- COLLABS -->
+    <section id="collabs">
+      <div class="section-label">Community Collab Pipeline</div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Active & Potential Collabs</span>
+          <button class="card-action" onclick="toggleCollabAdd()">+ Add collab</button>
+        </div>
+        <div class="collab-list" id="collabList"></div>
+        <div class="collab-add-row" id="collabAddRow">
+          <input class="add-input" id="collabName" placeholder="Partner / org name…" style="flex:1;min-width:140px" />
+          <input class="add-input" id="collabType" placeholder="Type (media, brand, venue…)" style="flex:1;min-width:120px" />
+          <select class="add-input" id="collabStatus" style="flex:0;width:120px">
+            <option value="talking">Talking</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="potential">Potential</option>
+          </select>
+          <button class="add-btn" onclick="addCollab()">Add</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast">Saved ✓</div>
+
+<!-- MERCH ADD MODAL (inline) -->
+<div id="merchAddModal" style="display:none;position:fixed;inset:0;background:rgba(26,13,0,0.4);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:var(--card);border-radius:16px;padding:28px;width:360px;max-width:90vw;display:flex;flex-direction:column;gap:14px;">
+    <div style="font-family:'Archivo Black',sans-serif;font-size:16px;color:var(--ink);">Add Merch Drop</div>
+    <input class="add-input" id="mName" placeholder="Drop name (e.g. Spring Capsule)" />
+    <input class="add-input" id="mDetail" placeholder="Details (price, SKU count, notes…)" />
+    <select class="add-input" id="mStatus">
+      <option value="live">Live on Shopify</option>
+      <option value="coming">Coming Soon</option>
+      <option value="concept">In Concept</option>
+    </select>
+    <div style="display:flex;gap:8px;">
+      <button class="add-btn" style="flex:1" onclick="addMerch()">Add Drop</button>
+      <button onclick="hideMerchAdd()" style="flex:1;background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px;font-family:'Archivo',sans-serif;font-size:12px;cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE = 'bsb_dash_v1';
+
+const DEFAULT = {
+  events: [
+    {
+      id: 'ev1', name: 'BHM Bounce', date: '2026-02-07',
+      location: 'Brooklyn Monarch', time: '10p–4a',
+      venue: 'confirmed', permit: 'done',
+      budget: { spent: 2400, total: 8000 },
+      notes: 'After party to Brooklyn Museum First Saturday. Video walls, game section, merch capsule, staged photo moment.'
+    },
+    {
+      id: 'ev2', name: 'Bounce Block Party', date: '2026-06-19',
+      location: 'Wandering Barman Block', time: 'TBD',
+      venue: 'confirmed', permit: 'pending',
+      budget: { spent: 0, total: 15000 },
+      notes: '2nd annual Juneteenth Block Party. Biggest BSB moment of the year.'
+    },
+    {
+      id: 'ev3', name: 'Bounce Family Reunion', date: '2026-08-28',
+      location: 'BK Monarch', time: 'TBD',
+      venue: 'pending', permit: 'needed',
+      budget: { spent: 0, total: 12000 },
+      notes: '2nd annual Family Reunion. End of summer capstone.'
+    },
+    {
+      id: 'ev4', name: 'LA Bounce', date: '2026-08-01',
+      location: 'TBD', time: 'TBD',
+      venue: 'needed', permit: 'needed',
+      budget: { spent: 0, total: 10000 },
+      notes: 'West coast expansion. Location TBD.'
+    },
+    {
+      id: 'ev5', name: 'Charlotte Bounce', date: '2026-07-18',
+      location: 'TBD', time: 'TBD',
+      venue: 'needed', permit: 'needed',
+      budget: { spent: 0, total: 8000 },
+      notes: 'Southeast market. Location TBD.'
+    },
+  ],
+  health: {
+    events: { 'Show promo cadence': 'on', 'Countdown content': 'on', 'Day-of stories': 'at', 'Post-event recap': 'on' },
+    content: { 'Photoshoot (1x/mo)': 'on', 'Bounce mini-doc': 'beh', 'Community portraits': 'at', 'Motion graphics': 'beh', 'Archive moments': 'at' },
+    community: { 'Cousin Walk': 'at', 'Game Nights (quarterly)': 'on', 'Community collabs': 'beh', 'Merch as culture': 'at' },
+  },
+  merch: [
+    { id: 'm1', name: 'BHM Capsule', status: 'live', detail: 'Feb drop · BHM collab · limited run' },
+    { id: 'm2', name: 'Juneteenth Block Party Tee', status: 'coming', detail: 'Jun 19 drop · event exclusive' },
+    { id: 'm3', name: 'Family Reunion Merch', status: 'concept', detail: 'End of summer · TBD' },
+  ],
+  collabs: [
+    { id: 'c1', name: 'CNW — Music To Cookout To', type: 'Content collab', status: 'confirmed' },
+    { id: 'c2', name: 'NYLA House', type: 'Community', status: 'potential' },
+    { id: 'c3', name: 'Gotham', type: 'Community', status: 'potential' },
+    { id: 'c4', name: 'Essence', type: 'Media', status: 'talking' },
+    { id: 'c5', name: 'BK Magazine', type: 'Media', status: 'talking' },
+  ],
+};
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (raw) return { ...DEFAULT, ...JSON.parse(raw) };
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+
+function save() {
+  localStorage.setItem(STORE, JSON.stringify(state));
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── DATE ──
+function daysUntil(d) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(d + 'T00:00:00');
+  return Math.ceil((target - today) / 86400000);
+}
+function fmtDate(d) {
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ── NAV DATE ──
+(function() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('navDate').textContent =
+    `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getDate()}`;
+})();
+
+// ── STATUS CYCLES ──
+const venueCycle   = { confirmed: 'pending', pending: 'needed', needed: 'na', na: 'confirmed' };
+const venueLabel   = { confirmed: 'Confirmed', pending: 'Pending', needed: 'Needed', na: 'N/A' };
+const venueClass   = { confirmed: 'sp-done', pending: 'sp-pending', needed: 'sp-needed', na: 'sp-na' };
+const permitCycle  = { done: 'pending', pending: 'needed', needed: 'na', na: 'done' };
+const permitLabel  = { done: 'Filed', pending: 'In Progress', needed: 'Not Started', na: 'N/A' };
+const permitClass  = { done: 'sp-done', pending: 'sp-pending', needed: 'sp-needed', na: 'sp-na' };
+const healthCycle  = { on: 'at', at: 'beh', beh: 'on' };
+const healthLabel  = { on: 'On Track', at: 'At Risk', beh: 'Behind' };
+const healthClass  = { on: 's-on', at: 's-at', beh: 's-beh' };
+const collabCycle  = { confirmed: 'talking', talking: 'potential', potential: 'confirmed' };
+const collabLabel  = { confirmed: 'Confirmed', talking: 'Talking', potential: 'Potential' };
+const collabClass  = { confirmed: 'sp-done', talking: 'sp-pending', potential: 'sp-na' };
+const merchStatusL = { live: 'Live', coming: 'Coming Soon', concept: 'In Concept' };
+const merchStatusC = { live: 'ms-live', coming: 'ms-coming', concept: 'ms-concept' };
+
+// ── RENDER EVENTS ──
+function renderEvents() {
+  const grid = document.getElementById('eventsGrid');
+  const sorted = [...state.events].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  // Update hero stats
+  const upcoming = sorted.filter(e => daysUntil(e.date) >= 0);
+  document.getElementById('heroEventCount').textContent = upcoming.length;
+  if (upcoming.length > 0) {
+    document.getElementById('heroDaysNext').textContent = Math.max(0, daysUntil(upcoming[0].date));
+  }
+
+  grid.innerHTML = sorted.map(ev => {
+    const days = daysUntil(ev.date);
+    let badgeCls, badgeText;
+    if (days < 0)      { badgeCls = 'badge-tbd';    badgeText = 'Past'; }
+    else if (days === 0){ badgeCls = 'badge-urgent'; badgeText = 'TODAY'; }
+    else if (days <= 7) { badgeCls = 'badge-urgent'; badgeText = `${days}d away`; }
+    else if (days <= 30){ badgeCls = 'badge-soon';   badgeText = `${days} days`; }
+    else                { badgeCls = 'badge-ok';     badgeText = `${days} days`; }
+
+    const pct = ev.budget.total > 0
+      ? Math.min(100, Math.round((ev.budget.spent / ev.budget.total) * 100)) : 0;
+    const barColor = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--warn)' : 'var(--orange)';
+
+    return `
+    <div class="event-card" id="ecard-${ev.id}">
+      <div class="event-card-top">
+        <div class="event-countdown-badge ${badgeCls}">${badgeText}</div>
+        <div class="event-card-name">${ev.name}</div>
+        <div class="event-card-meta">${fmtDate(ev.date)} · ${ev.location} · ${ev.time}</div>
+      </div>
+      <div class="event-card-body">
+        <div class="status-row">
+          <span class="status-label">Venue</span>
+          <button class="status-pill ${venueClass[ev.venue]}"
+            onclick="cycleEventField('${ev.id}','venue')">${venueLabel[ev.venue]}</button>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Permit</span>
+          <button class="status-pill ${permitClass[ev.permit]}"
+            onclick="cycleEventField('${ev.id}','permit')">${permitLabel[ev.permit]}</button>
+        </div>
+        <div class="budget-wrap">
+          <div class="budget-row">
+            <span class="budget-label">Budget</span>
+            <span class="budget-nums" style="cursor:pointer" onclick="toggleBudgetEdit('${ev.id}')">
+              $${ev.budget.spent.toLocaleString()} / $${ev.budget.total.toLocaleString()} (${pct}%)
+            </span>
+          </div>
+          <div class="budget-bar-bg">
+            <div class="budget-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+          <div class="budget-inputs" id="budget-edit-${ev.id}">
+            <input class="budget-input" id="bspent-${ev.id}" placeholder="Spent $" value="${ev.budget.spent}" type="number" />
+            <input class="budget-input" id="btotal-${ev.id}" placeholder="Total $" value="${ev.budget.total}" type="number" />
+            <button class="budget-save" onclick="saveBudget('${ev.id}')">Save</button>
+          </div>
+        </div>
+        <textarea class="event-card-notes" placeholder="Notes…"
+          onchange="saveEventNotes('${ev.id}', this.value)">${ev.notes || ''}</textarea>
+        <button class="event-delete-btn" onclick="deleteEvent('${ev.id}')">Remove event ×</button>
+      </div>
+    </div>`;
+  }).join('') + `
+    <div class="add-event-card">
+      <div class="add-event-title">+ New Event</div>
+      <div class="add-form">
+        <input class="add-input" id="newName" placeholder="Event name" />
+        <div class="add-row">
+          <input class="add-input" id="newDate" type="date" style="flex:1" />
+          <input class="add-input" id="newLoc" placeholder="Location" style="flex:1" />
+        </div>
+        <button class="add-btn" onclick="addEvent()">Add Event</button>
+      </div>
+    </div>`;
+}
+
+function cycleEventField(id, field) {
+  const ev = state.events.find(e => e.id === id);
+  if (!ev) return;
+  if (field === 'venue')  ev.venue  = venueCycle[ev.venue];
+  if (field === 'permit') ev.permit = permitCycle[ev.permit];
+  save(); renderEvents();
+}
+
+function toggleBudgetEdit(id) {
+  const el = document.getElementById(`budget-edit-${id}`);
+  el.classList.toggle('visible');
+}
+
+function saveBudget(id) {
+  const ev = state.events.find(e => e.id === id);
+  if (!ev) return;
+  ev.budget.spent = parseInt(document.getElementById(`bspent-${id}`).value) || 0;
+  ev.budget.total = parseInt(document.getElementById(`btotal-${id}`).value) || 0;
+  save(); renderEvents();
+}
+
+function saveEventNotes(id, val) {
+  const ev = state.events.find(e => e.id === id);
+  if (ev) { ev.notes = val; save(); }
+}
+
+function deleteEvent(id) {
+  if (confirm('Remove this event?')) {
+    state.events = state.events.filter(e => e.id !== id);
+    save(); renderEvents();
+  }
+}
+
+function addEvent() {
+  const name = document.getElementById('newName').value.trim();
+  const date = document.getElementById('newDate').value;
+  const loc  = document.getElementById('newLoc').value.trim() || 'TBD';
+  if (!name || !date) return;
+  state.events.push({
+    id: 'ev' + Date.now(), name, date,
+    location: loc, time: 'TBD',
+    venue: 'needed', permit: 'needed',
+    budget: { spent: 0, total: 0 },
+    notes: ''
+  });
+  save(); renderEvents();
+}
+
+// ── RENDER HEALTH ──
+function renderHealth() {
+  ['events','content','community'].forEach(col => {
+    const container = document.getElementById(`health-${col}`);
+    container.innerHTML = Object.entries(state.health[col]).map(([name, status]) => `
+      <div class="health-item">
+        <span class="health-name">${name}</span>
+        <button class="health-status ${healthClass[status]}"
+          onclick="cycleHealth('${col}','${name}')">${healthLabel[status]}</button>
+      </div>`).join('');
+  });
+}
+
+function cycleHealth(col, name) {
+  state.health[col][name] = healthCycle[state.health[col][name]];
+  save(); renderHealth();
+}
+
+// ── RENDER MERCH ──
+function renderMerch() {
+  const grid = document.getElementById('merchGrid');
+  grid.innerHTML = state.merch.map(m => `
+    <div class="merch-item">
+      <button class="merch-delete" onclick="deleteMerch('${m.id}')">×</button>
+      <div class="merch-status-badge ${merchStatusC[m.status]}">${merchStatusL[m.status]}</div>
+      <div class="merch-name">${m.name}</div>
+      <div class="merch-detail">${m.detail}</div>
+    </div>`).join('') +
+    `<button class="merch-add-btn" onclick="showMerchAdd()">+ Add drop</button>`;
+}
+
+function showMerchAdd() {
+  document.getElementById('merchAddModal').style.display = 'flex';
+}
+function hideMerchAdd() {
+  document.getElementById('merchAddModal').style.display = 'none';
+}
+
+function addMerch() {
+  const name   = document.getElementById('mName').value.trim();
+  const detail = document.getElementById('mDetail').value.trim();
+  const status = document.getElementById('mStatus').value;
+  if (!name) return;
+  state.merch.push({ id: 'm' + Date.now(), name, detail, status });
+  save(); renderMerch(); hideMerchAdd();
+  document.getElementById('mName').value = '';
+  document.getElementById('mDetail').value = '';
+}
+
+function deleteMerch(id) {
+  state.merch = state.merch.filter(m => m.id !== id);
+  save(); renderMerch();
+}
+
+// ── RENDER COLLABS ──
+function renderCollabs() {
+  const list = document.getElementById('collabList');
+  if (state.collabs.length === 0) {
+    list.innerHTML = '<div class="empty">No collabs yet — add one above</div>';
+    return;
+  }
+  list.innerHTML = state.collabs.map(c => `
+    <div class="collab-row">
+      <div>
+        <div class="collab-name">${c.name}</div>
+        <div class="collab-type">${c.type}</div>
+      </div>
+      <button class="collab-status ${collabClass[c.status]}"
+        onclick="cycleCollab('${c.id}')">${collabLabel[c.status]}</button>
+      <button class="collab-delete" onclick="deleteCollab('${c.id}')">×</button>
+    </div>`).join('');
+}
+
+function cycleCollab(id) {
+  const c = state.collabs.find(c => c.id === id);
+  if (c) { c.status = collabCycle[c.status]; save(); renderCollabs(); }
+}
+
+function deleteCollab(id) {
+  state.collabs = state.collabs.filter(c => c.id !== id);
+  save(); renderCollabs();
+}
+
+function toggleCollabAdd() {
+  document.getElementById('collabAddRow').classList.toggle('visible');
+  document.getElementById('collabName').focus();
+}
+
+function addCollab() {
+  const name   = document.getElementById('collabName').value.trim();
+  const type   = document.getElementById('collabType').value.trim() || 'Collab';
+  const status = document.getElementById('collabStatus').value;
+  if (!name) return;
+  state.collabs.push({ id: 'c' + Date.now(), name, type, status });
+  save(); renderCollabs();
+  document.getElementById('collabName').value = '';
+  document.getElementById('collabType').value = '';
+  document.getElementById('collabAddRow').classList.remove('visible');
+}
+
+// close modal on outside click
+document.getElementById('merchAddModal').addEventListener('click', function(e) {
+  if (e.target === this) hideMerchAdd();
+});
+
+// ── INIT ──
+renderEvents();
+renderHealth();
+renderMerch();
+renderCollabs();
+</script>
+</body>
+</html>
