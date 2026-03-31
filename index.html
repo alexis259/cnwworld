@@ -979,50 +979,58 @@ function save() {
   }, 800);
 }
 
-async function syncFromWorlds() {
+function _readLocalHealth(storeKey) {
   try {
-    const [bsbRes, lvRes] = await Promise.all([
-      fetch('/.netlify/functions/getData?world=bsb'),
-      fetch('/.netlify/functions/getData?world=lv'),
-    ]);
-    let updated = false;
+    const raw = localStorage.getItem(storeKey);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
 
-    if (bsbRes.ok) {
-      const bsbData = await bsbRes.json();
-      if (bsbData.health) {
-        const flat = {};
-        Object.values(bsbData.health).forEach(col => Object.assign(flat, col));
-        if (Object.keys(flat).length) { state.health.bsb = flat; updated = true; }
-      }
-    }
+async function syncFromWorlds() {
+  let updated = false;
 
-    if (lvRes.ok) {
-      const lvData = await lvRes.json();
-      if (lvData.health?.lv) {
-        state.health.lv = lvData.health.lv;
-        updated = true;
-      } else if (lvData.events) {
-        const healthFromEvents = {};
-        Object.values(lvData.events).forEach(ev => {
-          if (ev.title) healthFromEvents[ev.title] = ev.done ? 'on' : 'beh';
-        });
-        if (Object.keys(healthFromEvents).length) {
-          state.health.lv = healthFromEvents;
-          updated = true;
-        }
-      }
-    }
-
-    if (updated) {
-      renderHealth();
-      const subtitle = document.querySelector('#health .card-header span:last-child');
-      if (subtitle) {
-        const orig = subtitle.textContent;
-        subtitle.textContent = 'Synced ✓';
-        setTimeout(() => { subtitle.textContent = orig; }, 2000);
-      }
-    }
+  // ── BSB ──
+  let bsbData = null;
+  try {
+    const res = await fetch('/.netlify/functions/getData?world=bsb');
+    if (res.ok) bsbData = await res.json();
   } catch(e) {}
+  if (!bsbData) bsbData = _readLocalHealth('bsb_dash_v1');
+
+  if (bsbData?.health) {
+    const flat = {};
+    Object.values(bsbData.health).forEach(col => Object.assign(flat, col));
+    if (Object.keys(flat).length) { state.health.bsb = flat; updated = true; }
+  }
+
+  // ── LV ──
+  let lvData = null;
+  try {
+    const res = await fetch('/.netlify/functions/getData?world=lv');
+    if (res.ok) lvData = await res.json();
+  } catch(e) {}
+  if (!lvData) lvData = _readLocalHealth('lv_roadmap_v2');
+
+  if (lvData?.health?.lv) {
+    state.health.lv = lvData.health.lv;
+    updated = true;
+  } else if (lvData?.events) {
+    const healthFromEvents = {};
+    Object.values(lvData.events).forEach(ev => {
+      if (ev.title) healthFromEvents[ev.title] = ev.done ? 'on' : 'beh';
+    });
+    if (Object.keys(healthFromEvents).length) { state.health.lv = healthFromEvents; updated = true; }
+  }
+
+  if (updated) {
+    renderHealth();
+    const subtitle = document.querySelector('#health .card-header span:last-child');
+    if (subtitle) {
+      const orig = subtitle.textContent;
+      subtitle.textContent = 'Synced ✓';
+      setTimeout(() => { subtitle.textContent = orig; }, 2000);
+    }
+  }
 }
 
 // ── CLOCK ──
